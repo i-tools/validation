@@ -6,7 +6,6 @@
  *
  * PHP Version  5.4.4
  *
- * @package     newrobocall.api
  * @category
  * @plugin URI
  * @copyright   2015, Alex Krasnov. All Rights Reserved.
