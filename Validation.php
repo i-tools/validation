@@ -118,6 +118,7 @@ class Validation {
 		$pattern = isset($rules['pattern']) ? $rules['pattern'] : NULL;
 		$default = isset($rules['default']) ? true : false;
 		$required = false;
+		$checkMX = false;
 		$result = false;
 
 		// Проверка флага 'default'
@@ -127,8 +128,8 @@ class Validation {
 		}
 		if ( isset($rules['default']) ) unset($rules['default']);
 
-		// Обработка флага 'requared'
-		$required_keys = array_keys($rules, 'requared', true);
+		// Обработка флага 'required'
+		$required_keys = array_keys($rules, 'required', true);
 		if ( $required_keys ) {
 			$required = true;
 			foreach($required_keys as $key) {
@@ -136,6 +137,16 @@ class Validation {
 			}
 		}
 		unset($required_keys);
+
+         // Обработка флага 'check_mx'
+         $required_keys = array_keys($rules, 'check_mx', true);
+         if ( $required_keys ) {
+             $checkMX = true;
+             foreach($required_keys as $key) {
+                 unset($rules[$key]);
+             }
+         }
+         unset($required_keys);
 
 		// Проверка на необходимость значения
 		if ( $required && !self::isRequired($arg) ) {
@@ -174,11 +185,18 @@ class Validation {
 	     			if ( !empty($arg) ) return true;
 	     			break;
 	     		case 'email':
+	     		    // Валидация сделана на regex т.к. на момент написания стандартная проверка не работала с кириллическими доменами
 	     			if ( preg_match("/(^[а-яА-ЯёЁa-zA-Z0-9_\.-]{1,}@([а-яА-ЯёЁa-zA-Z0-9_-]{1,}\.){1,}[а-яА-ЯёЁa-zA-Z0-9_-]{2,}$)/iu", $arg ) ) {
 	     				$result = true;
 	     			}
+	     			if ( isset($checkMX) )
+                    {
+                        $domain = $domain = substr($arg, strpos($arg, '@') + 1);
+                        $result = self::checkMX($domain);
+                    }
 	     			break;
 	     		case 'url':
+                    // Валидация сделана на regex т.к. на момент написания стандартная проверка не работала с кириллическими доменами
 	     			if ( preg_match("/\b(?:(?:https?|ftps?|sftp):\/\/|www\.)[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%=~_|]/iu", $arg ) ) {
 	     				$result = true;
 	     			}

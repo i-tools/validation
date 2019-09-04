@@ -18,15 +18,15 @@ $params = array(
 	'bar' => 'itools',
 	'baz' => NULL,
 	'int' => NULL,
-	'int2' => NULL
+	'int2' => NULL,
 );
 
 $result = Validation::check($params, array(
-	'foo' => 'float',
-	'baz' => array('int', 'min' => 2, 'requared', 'default' => 2),
-	'bar' => array('string', 'min' => 0, 'requared', 'max' => 12, 'default' => 'itools', 'requared'),
-	'int' => array('int', 'required'),
-	'int2' => array('int', 'default' => 1000)
+        'foo' => 'float',
+        'baz' => array('int', 'min' => 2, 'required', 'default' => 2),
+        'bar' => array('string', 'min' => 0, 'required', 'max' => 12, 'default' => 'itools', 'required'),
+        'int' => array('int', 'required'),
+        'int2' => array('int', 'default' => 1000),
 	),
 	function($defaults) use (&$params) {
 		$params = array_replace($params, $defaults);
@@ -40,6 +40,27 @@ if ( in_array(false, $result) ) {
 		'success' => false,
 		'fields' => $result
 	));
+}
+
+// CHeck email
+$params = array(
+    'email' => 'alex@i-tools.ru'
+);
+
+$result = Validation::check($params, array(
+    'email' => array('email', 'check_mx')
+),
+    function($defaults) use (&$params) {
+        $params = array_replace($params, $defaults);
+    }
+);
+
+
+if ( in_array(false, $result) ) {
+    my_print_r(array(
+        'success' => false,
+        'fields' => $result
+    ));
 }
 
 $params = array(
@@ -48,8 +69,8 @@ $params = array(
 );
 
 $result = Validation::check($params, array(
-	'int' => array('int', 'min' => 2, 'requared', 'default' => 2),
-	'login' => array('string', 'min' => 1, 'max' => 12, 'requared', 'default' => 'itools', 'requared')
+	'int' => array('int', 'min' => 2, 'required', 'default' => 2),
+	'login' => array('string', 'min' => 1, 'max' => 12, 'required', 'default' => 'itools', 'required')
 	),
 	function($defaults) use (&$params) {
 		$params = array_replace($params, $defaults);
@@ -64,20 +85,3 @@ if ( in_array(false, $result) ) {
 		'fields' => $result
 	));
 }
-
-/*$nickname = "";
-
-function test($name, $callback = NULL) {
-	if ( is_callable($callback) ) {
-		$callback($name);
-	}
-}
-
-test("ITOOLS 2", function($value) use (&$nickname) {
-	$nickname = $value;
-});
-
-echo $nickname;*/
-
-
-?>
