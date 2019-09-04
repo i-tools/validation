@@ -58,6 +58,8 @@ class Validation {
 	 * 	  а значения равные 0, 0.0, "0" или array() не считаются пустыми, для проверки которых лучше использовать 'not_empty'
      * - 'pattern'
      *    работает с 'custom': шаблон для проверки @see preg_match
+     * - 'check_mx'
+     *    работает с типом 'email' проверяет домен на наличие MX записи в DNS.
      * @param callable		$callback анонимная функция для возврата параметров 'default'
      * @return bool
      */
