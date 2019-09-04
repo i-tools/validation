@@ -270,4 +270,21 @@ class Validation {
 		return true;
 	}
 
+    /**
+     * Вспомогательная функция для self::_checkArg()
+     * проверяет домен на наличие MX записи.
+     *
+     * @param $domain
+     * @return bool
+     */
+	public static function checkMX($domain)
+    {
+        if (function_exists('checkdnsrr'))
+        {
+            return (bool)checkdnsrr($domain, 'MX');
+        }
+
+        return false;
+    }
+
 }
