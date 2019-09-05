@@ -11,7 +11,7 @@ function my_print_r($what)
         print "</pre>";
 }
 
-require_once('./Validation.php');
+require_once('../src/Validation.php');
 
 $params = array(
 	'foo' => 10.4,
@@ -47,7 +47,8 @@ $params = array(
     'email' => 'alex@i-tools.ru'
 );
 
-$result = Validation::check($params, array(
+    /** @var array $result */
+    $result = Validation::check($params, array(
     'email' => array('email', 'check_mx')
 ),
     function($defaults) use (&$params) {
