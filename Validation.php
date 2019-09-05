@@ -24,7 +24,8 @@
  *
  */
 
-class Validation {
+class Validation
+{
 
 	private static $_defaults = array();
 	/**
@@ -92,26 +93,25 @@ class Validation {
             $result[$key] = self::_checkArg($arg[$key], $itemRule, $key);
         }
         
-        if ( is_callable($callback) ) {
-			$callback(self::$_defaults);
-		}
+        if ( is_callable($callback) ) $callback(self::$_defaults);
 
         return $result;
     }
 
-	/**
+    /**
      * Вспомогательная функция для self::check()
      * возвращает true если $arg проходит валидацию $rules;
      * в противном случае возвращается false
      *
      * @see self::check()
      *
-     * @param  mixed        $arg
-     * @param  string|array $rules
+     * @param $arg
+     * @param $rules
+     * @param null $key
      * @return bool
      */
-     protected static function _checkArg($arg, $rules, $key = NULL) {
-
+     protected static function _checkArg($arg, $rules, $key = NULL)
+     {
      	$rules = (array)$rules;
 		$min = isset($rules['min']) ? (float) $rules['min'] : NULL;
 		$max = isset($rules['max']) ? (float) $rules['max'] : NULL;
@@ -123,13 +123,14 @@ class Validation {
 
 		// Проверка флага 'default'
 		if ( $default && !self::isRequired($arg) && $key ) {
-			$arg = $rules['default'];
+            $arg = $rules['default'];
 			self::$_defaults[$key] = $rules['default'];
 		}
 		if ( isset($rules['default']) ) unset($rules['default']);
 
 		// Обработка флага 'required'
 		$required_keys = array_keys($rules, 'required', true);
+
 		if ( $required_keys ) {
 			$required = true;
 			foreach($required_keys as $key) {
@@ -139,19 +140,18 @@ class Validation {
 		unset($required_keys);
 
          // Обработка флага 'check_mx'
-         $required_keys = array_keys($rules, 'check_mx', true);
-         if ( $required_keys ) {
+         $check_mx_keys = array_keys($rules, 'check_mx', true);
+
+         if ( $check_mx_keys ) {
              $checkMX = true;
-             foreach($required_keys as $key) {
+             foreach($check_mx_keys as $key) {
                  unset($rules[$key]);
              }
          }
-         unset($required_keys);
+         unset($check_mx_keys);
 
 		// Проверка на необходимость значения
-		if ( $required && !self::isRequired($arg) ) {
-			return false;
-		}
+		if ( $required && !self::isRequired($arg) ) return false;
 
 		// Удаляем вспомогательные флаги
 		if ( isset($rules['min']) ) unset($rules['min']);
@@ -159,77 +159,61 @@ class Validation {
 		if ( isset($rules['pattern']) ) unset($rules['pattern']);
 
      	// Пробегаем по массиву типов
-     	foreach ($rules as $rule) {
-     		switch ( strtolower($rule) ) {
+     	foreach ($rules as $rule)
+     	{
+     		switch ( strtolower($rule) )
+            {
      			case 'int':
-	     			if ( preg_match('/^\+?\d+$/', $arg) ) {
-	     				$result = self::checkNumRange($arg, $min, $max);
-	     			}
+	     			if ( preg_match('/^\+?\d+$/', $arg) ) $result = self::checkNumRange($arg, $min, $max);
 	     			break;
 	     		case 'float':
-	     			if ( preg_match('/\d+(\.\d+)?/', $arg) ) {
-	     				$result = self::checkNumRange($arg, $min, $max);
-	     			}
+	     			if ( preg_match('/\d+(\.\d+)?/', $arg) ) $result = self::checkNumRange($arg, $min, $max);
 	     			break;
 	     		case 'num':
-	     			if ( is_numeric($arg) ) {
-	     				$result = self::checkNumRange($arg, $min, $max);
-	     			}
+	     			if ( is_numeric($arg) ) $result = self::checkNumRange($arg, $min, $max);
 	     			break;
 	     		case 'string':
-	     			if ( is_string($arg) ) {
-	     				$result = self::checkStrLen($arg, $min, $max) ;
-	     			}
+	     			if ( is_string($arg) ) $result = self::checkStrLen($arg, $min, $max);
 	     			break;
 	     		case 'not_empty':
 	     			if ( !empty($arg) ) return true;
 	     			break;
 	     		case 'email':
 	     		    // Валидация сделана на regex т.к. на момент написания стандартная проверка не работала с кириллическими доменами
-	     			if ( preg_match("/(^[а-яА-ЯёЁa-zA-Z0-9_\.-]{1,}@([а-яА-ЯёЁa-zA-Z0-9_-]{1,}\.){1,}[а-яА-ЯёЁa-zA-Z0-9_-]{2,}$)/iu", $arg ) ) {
-	     				$result = true;
-	     			}
-	     			if ( isset($checkMX) )
-                    {
+                    $emailPattern = '/(^[а-яА-ЯёЁa-zA-Z0-9_\.-]{1,}@([а-яА-ЯёЁa-zA-Z0-9_-]{1,}\.){1,}[а-яА-ЯёЁa-zA-Z0-9_-]{2,}$)/iu';
+	     			if ( preg_match($emailPattern, $arg ) ) $result = true;
+
+	     			if ( isset($checkMX) ) {
                         $domain = $domain = substr($arg, strpos($arg, '@') + 1);
                         $result = self::checkMX($domain);
                     }
 	     			break;
 	     		case 'url':
                     // Валидация сделана на regex т.к. на момент написания стандартная проверка не работала с кириллическими доменами
-	     			if ( preg_match("/\b(?:(?:https?|ftps?|sftp):\/\/|www\.)[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%=~_|]/iu", $arg ) ) {
-	     				$result = true;
-	     			}
+                    $urlPattern = '/\b(?:(?:https?|ftps?|sftp):\/\/|www\.)[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-а-яА-ЯёЁa-zA-Z0-9+&@#\/%=~_|]/iu';
+	     			if ( preg_match($urlPattern, $arg ) ) $result = true;
 					break;
 	     		case 'ipv4':
-	     			if ( preg_match("/^((\d|[1-9]\1d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$/", $arg ) ) {
-	     				$result = true;
-	     			}
+	     		    $ipv4Pattern = '/^((\d|[1-9]d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$/';
+	     			if ( preg_match($ipv4Pattern, $arg ) ) $result = true;
 	     			break;
 	     		case 'ipv6':
-	     			if ( preg_match("/^(((?=(?>.*?(::))(?!.+\3)))\3?|([\dA-F]{1,4}(\3|:(?!$)|$)|\2))(?4){5}((?4){2}|((2[0-4]|1\d|[1-9])?\d|25[0-5])(\.(?7)){3})\z/i", $arg ) ) {
-	     				$result = true;
-	     			}
+                    $ipv6Pattern = '/^(((?=(?>.*?(::))(?!.+)))?|([\dA-F]{1,4}(|:(?!$)|$)|))(?4){5}((?4){2}|((2[0-4]|1\d|[1-9])?\d|25[0-5])(\.(?7)){3})\z/i';
+	     			if ( preg_match($ipv6Pattern, $arg ) ) $result = true;
 	     			break;
 	     		case 'phone':
                     //@todo Проверка не только российского кода страны
-                    $phone_pattern = "/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/"; // "/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/"
-	     			if ( $data = preg_match_all($phone_pattern, $arg ) ) {
-	     				$result = true;
-	     			}
+                    $phonePattern = "/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/";
+	     			if ( $data = preg_match_all($phonePattern, $arg ) ) $result = true;
                     break;
 				case 'json':
                 	$result = is_string($arg) && is_array(json_decode($arg, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
                 	break;
 	     		case 'custom':
-	     			if ( preg_match($pattern, $arg ) ) {
-	     				return true;
-	     			}
+	     			if ( preg_match($pattern, $arg ) ) return true;
 	     			break;
 	     		case 'file':
-	     			if ($arg['error'] == UPLOAD_ERR_OK) {
-	     				$result = true;
-	     			}
+	     			if ($arg['error'] == UPLOAD_ERR_OK) $result = true;
 	     			break;
 				default:
 	     			$result = false;
@@ -246,12 +230,9 @@ class Validation {
 	 * @param  mixed          $arg
 	 * @return bool
 	 */     
-	public static function isRequired($arg) {
-		if ( is_null($arg) || (is_string($arg) && strlen($arg) == 0) ) {
-			return false;
-     	}
-     	
-     	return true;
+	public static function isRequired($arg)
+    {
+		return ( is_null($arg) || (is_string($arg) && strlen($arg) == 0) ) ? false : true;
 	}
      
 	/**
@@ -299,12 +280,7 @@ class Validation {
      */
 	public static function checkMX($domain)
     {
-        if (function_exists('checkdnsrr'))
-        {
-            return (bool)checkdnsrr($domain, 'MX');
-        }
-
-        return false;
+        return ( function_exists('checkdnsrr') ) ? (bool)checkdnsrr($domain, 'MX') : false;
     }
 
 }
