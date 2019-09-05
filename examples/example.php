@@ -23,9 +23,9 @@ Validation::check(
     array(
         'name' => 'may_name',
         'created' => 34234234,
-        'mail' => 'zara@tools79.ru',
-        'phone' => '+7 (3452) 555555',
-        'domain' => 'https://www.crtweb.ru',
+        'mail' => 'dsfdfd@mail.ru',
+        'phone' => '+7 (3452) 555-555',
+        'domain' => 'www.crtweb.ru',
         'url' => 'https://www.crtweb.ru/contact/'
     ),
     array(

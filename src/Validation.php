@@ -157,6 +157,7 @@ class Validation
         $pattern = isset($rules['pattern']) ? $rules['pattern'] : null;
         $default = isset($rules['default']) ? true : false;
         $required = false;
+        $checkMX = false;
         $result = false;
 
         // Проверка флага 'default'
@@ -242,7 +243,7 @@ class Validation
                          $result = true;
                      }
 
-                     if (isset($checkMX)) {
+                     if ($checkMX == true && isset($arg)) {
                          $domain = substr($arg, strpos($arg, '@') + 1);
                          $result = self::checkMX($domain, $name);
                      }
@@ -268,8 +269,9 @@ class Validation
                      break;
                  case 'phone':
                     //@todo Проверка не только российского кода страны
-                    $phonePattern = "/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/";
+                    $phonePattern = "/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/";
                      if ($data = preg_match_all($phonePattern, $arg)) {
+                         var_dump('HERE');
                          $result = true;
                      }
                     break;
@@ -393,7 +395,7 @@ class Validation
 
         if (!$result && $name !== null) {
             self::_setMainError(ERROR_INCORRECT_VALUE);
-            self::_error($name, ERROR_EMAIL_DOMAIN, _("MX record for domain not found."));
+            self::_error($name, ERROR_EMAIL_DOMAIN, _("MX record not found for domain."));
         }
 
         return $result;
