@@ -4,7 +4,7 @@
  * @file        Validation.php
  * @description
  *
- * PHP Version  5.4.4
+ * PHP Version  5.6
  *
  * @category
  * @plugin URI
