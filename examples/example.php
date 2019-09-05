@@ -13,82 +13,31 @@ function my_print_r($what)
 
 require_once('../src/Validation.php');
 
-$params = array(
-    'foo' => 10.4,
-    'bar' => 'itools',
-    'baz' => null,
-    'int' => null,
-    'int2' => null,
+Validation::check(null, array('email', 'required'), 'email');
+$msg = Validation::success() ? "Good" : null;
+my_print_r(
+    Validation::result($msg)
 );
 
-$result = Validation::check(
-    $params,
+Validation::check(
     array(
-        'foo' => 'float',
-        'baz' => array('int', 'min' => 2, 'required', 'default' => 2),
-        'bar' => array('string', 'min' => 0, 'required', 'max' => 12, 'default' => 'itools', 'required'),
-        'int' => array('int', 'required'),
-        'int2' => array('int', 'default' => 1000),
+        'name' => 'may_name',
+        'created' => 34234234,
+        'mail' => 'zara@tools79.ru',
+        'phone' => '+7 (3452) 555555',
+        'domain' => 'https://www.crtweb.ru',
+        'url' => 'https://www.crtweb.ru/contact/'
     ),
-    function ($defaults) use (&$params) {
-        $params = array_replace($params, $defaults);
-    }
-);
-
-my_print_r($params);
-
-if (in_array(false, $result)) {
-    my_print_r(array(
-        'success' => false,
-        'fields' => $result
-    ));
-}
-
-// CHeck email
-$params = array(
-    'email' => 'alex@i-tools.ru'
-);
-
-    /** @var array $result */
-    $result = Validation::check(
-        $params,
-        array(
-    'email' => array('email', 'check_mx')
-),
-        function ($defaults) use (&$params) {
-            $params = array_replace($params, $defaults);
-        }
-    );
-
-
-if (in_array(false, $result)) {
-    my_print_r(array(
-        'success' => false,
-        'fields' => $result
-    ));
-}
-
-$params = array(
-    'int' => 0,
-    'login' => null
-);
-
-$result = Validation::check(
-    $params,
     array(
-    'int' => array('int', 'min' => 2, 'required', 'default' => 2),
-    'login' => array('string', 'min' => 1, 'max' => 12, 'required', 'default' => 'itools', 'required')
-    ),
-    function ($defaults) use (&$params) {
-        $params = array_replace($params, $defaults);
-    }
+        'name'     => array('string', 'min' => 5, 'max' => 20),
+        'created'  => array('int', 'required'),
+        'mail'     => array('email', 'check_mx'),
+        'phone'    => 'phone',
+        'domain' => array('domain', 'required'),
+        'url' => array('url', 'required')
+    )
 );
 
-my_print_r($params);
-
-if (in_array(false, $result)) {
-    my_print_r(array(
-        'success' => false,
-        'fields' => $result
-    ));
-}
+my_print_r(
+    Validation::result()
+);

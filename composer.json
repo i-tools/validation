@@ -21,5 +21,9 @@
         "cs-fix": [
             "php-cs-fixer fix src --rules=@PSR2"
         ]
-    }
+    },
+  "require": {
+      "ext-json": "*",
+      "ext-gettext": "*"
+  }
 }
